@@ -12,7 +12,7 @@ deleteDialog({entity, function}) {
           onPressed: function,
         ),
         TextButton(
-          child: Text("Yes"),
+          child: Text("No"),
           onPressed: () {
             Get.back(result: false);
           },

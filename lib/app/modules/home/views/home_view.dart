@@ -95,73 +95,82 @@ class HomeView extends GetView<HomeController> {
                               ),
                             );
                           if (snapshot.data!.length == 0) return Center(child: Text("No Data available"));
-                          return ListView.builder(
-                            physics: ClampingScrollPhysics(),
-                            shrinkWrap: true,
-                            itemCount: snapshot.data!.length,
-                            itemBuilder: (context, index) {
-                              // controller.taskLength.value = snapshot.data!.length;
-                              TaskModel task = snapshot.data![index];
-                              return InkWell(
-                                onLongPress: () {
-                                  deleteDialog(
-                                      entity: "Are you sure you want to delete this task?",
-                                      function: () {
-                                        Get.back();
-                                        controller.delete(task.id);
-                                      });
-                                },
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(vertical: 8),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: <Widget>[
-                                      Text(
-                                        task.task,
-                                        style: TextStyle(
-                                          fontSize: 26,
-                                          fontWeight: FontWeight.normal,
-                                          decoration: task.isSelected ? TextDecoration.lineThrough : TextDecoration.none,
-                                        ),
-                                      ),
-                                      // value: index % 2 == 0 ? false : true,
-                                      Padding(
-                                        padding: const EdgeInsets.only(left: 2.0, right: 2.0),
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                              border: Border.all(
-                                                color: task.isSelected ? Colors.black : Colors.black,
-                                                width: 2,
+                          return SingleChildScrollView(
+                            child: Column(
+                              children: [
+                                ListView.builder(
+                                  physics: ClampingScrollPhysics(),
+                                  shrinkWrap: true,
+                                  itemCount: snapshot.data!.length,
+                                  itemBuilder: (context, index) {
+                                    // controller.taskLength.value = snapshot.data!.length;
+                                    TaskModel task = snapshot.data![index];
+                                    return InkWell(
+                                      onLongPress: () {
+                                        deleteDialog(
+                                            entity: "Are you sure you want to delete this task?",
+                                            function: () {
+                                              Get.back();
+                                              controller.delete(task.id);
+                                            });
+                                      },
+                                      child: Container(
+                                        padding: EdgeInsets.symmetric(vertical: 8),
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: <Widget>[
+                                            Text(
+                                              task.task,
+                                              style: TextStyle(
+                                                fontSize: 26,
+                                                fontWeight: FontWeight.normal,
+                                                decoration: task.isSelected ? TextDecoration.lineThrough : TextDecoration.none,
                                               ),
-                                              borderRadius: BorderRadius.all(
-                                                Radius.circular(5),
-                                              )),
-                                          width: 20,
-                                          height: 20,
-                                          child: Theme(
-                                            data: ThemeData(
-                                              unselectedWidgetColor: Colors.transparent,
                                             ),
-                                            child: Checkbox(
-                                              activeColor: Colors.black,
-                                              checkColor: Colors.white,
-                                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                                              visualDensity: VisualDensity.standard,
-                                              value: task.isSelected,
-                                              tristate: false,
-                                              onChanged: (bool? isChecked) {
-                                                task.isSelected = !task.isSelected;
-                                                controller.updateTask(task);
-                                              },
+                                            // value: index % 2 == 0 ? false : true,
+                                            Padding(
+                                              padding: const EdgeInsets.only(left: 2.0, right: 2.0),
+                                              child: Container(
+                                                decoration: BoxDecoration(
+                                                    border: Border.all(
+                                                      color: task.isSelected ? Colors.black : Colors.black,
+                                                      width: 2,
+                                                    ),
+                                                    borderRadius: BorderRadius.all(
+                                                      Radius.circular(5),
+                                                    )),
+                                                width: 20,
+                                                height: 20,
+                                                child: Theme(
+                                                  data: ThemeData(
+                                                    unselectedWidgetColor: Colors.transparent,
+                                                  ),
+                                                  child: Checkbox(
+                                                    activeColor: Colors.black,
+                                                    checkColor: Colors.white,
+                                                    materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                                    visualDensity: VisualDensity.standard,
+                                                    value: task.isSelected,
+                                                    tristate: false,
+                                                    onChanged: (bool? isChecked) {
+                                                      task.isSelected = !task.isSelected;
+                                                      controller.updateTask(task);
+                                                    },
+                                                  ),
+                                                ),
+                                              ),
                                             ),
-                                          ),
+                                          ],
                                         ),
                                       ),
-                                    ],
-                                  ),
+                                    );
+                                  },
                                 ),
-                              );
-                            },
+                                SizedBox(
+                                  height: 100,
+                                )
+                              ],
+                            ),
                           );
                         }),
                   ),
@@ -198,22 +207,30 @@ class HomeView extends GetView<HomeController> {
           SizedBox(height: 10),
           TextField(
             controller: controller.taskController,
+            autofocus: true,
+            onSubmitted: (text) {
+              addFunction(context);
+            },
           ),
           SizedBox(height: 20),
           CustomButton("Add", 0, 0, () {
-            if (controller.taskController.text == "") {
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                content: Text("Task Cannot be empty"),
-                backgroundColor: Colors.red,
-              ));
-            } else {
-              TaskModel task = TaskModel(id: getRandomString(10), task: controller.taskController.text, isSelected: false);
-              controller.addTask(task);
-              Get.back();
-            }
+            addFunction(context);
           }),
         ],
       ),
     );
+  }
+
+  addFunction(context) {
+    if (controller.taskController.text == "") {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("Task Cannot be empty"),
+        backgroundColor: Colors.red,
+      ));
+    } else {
+      TaskModel task = TaskModel(id: getRandomString(10), task: controller.taskController.text, isSelected: false);
+      controller.addTask(task);
+      Get.back();
+    }
   }
 }
